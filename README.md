@@ -1,2 +1,2 @@
 # MSC_DS
-University of Illinois Master of Data Science
+University of Illinois Master's of Data Science
