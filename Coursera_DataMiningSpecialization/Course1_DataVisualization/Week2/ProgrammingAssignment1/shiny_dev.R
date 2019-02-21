@@ -4,15 +4,15 @@ library(colorRamps)
 library(dplyr)
 library(shiny)
 
-unzip("rawdata.zip")
-GISTEMP.data <-read.csv(file = unzip("rawdata.zip",list = TRUE)$Name[2])
+source("line_graph.R")
+
 flat.temps<-melt(GISTEMP.data, id.vars = names(GISTEMP.data)[1], variable.name = "Splits", value.name = "Temp.Diffs")
 flat.temps$Temp.Diffs<-pmax(rep(-max(flat.temps$Temp.Diffs),nrow(flat.temps)),flat.temps$Temp.Diffs)+max(flat.temps$Temp.Diffs)
 
 ui<-fluidPage(
       theme = "bootstrap.css",
       h4("Author: ",em("Brian Stroh")),
-      h4("Date: ",em("November 7th, 2018")),
+      h4("Date: ",em("February 21st, 2019")),
       br(),
       pageWithSidebar(
             headerPanel(title = "Global Temperature Anomalies from 1980-2014"),
@@ -25,7 +25,9 @@ ui<-fluidPage(
                   h5("Central colors indicate that the temperature anomalies in this zone for this year are close to the average temperatures from the period 1951-1980.")
             ),
             mainPanel(
-                  leafletOutput("my.map")
+                  leafletOutput("my.map"),
+                  plotlyOutput("myPlot"),
+                  p("Temperatures shown are relative to the 1951-1980 average")
             )
       )
 )
@@ -39,6 +41,12 @@ server <-function(input, output, session) {
                  width = 300,
                  height = 30)
       }, deleteFile = FALSE)
+      
+      
+      output$myPlot <- renderPlotly({
+            print(my_plot)
+      })
+      
       
       map.init <- reactive({
             leaflet() %>% 
@@ -197,4 +205,3 @@ server <-function(input, output, session) {
 
 
 shinyApp(ui, server)
-
